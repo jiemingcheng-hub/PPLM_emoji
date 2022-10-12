@@ -312,6 +312,32 @@ def get_generic_dataset(dataset_fp, tokenizer, device,
 
     return Dataset(x, y)
 
+def read_data(data_path):
+    f = open(data_path, 'r', encoding='utf-8')
+    Lines = f.readlines()
+    train_data = []
+    for i in range(80000):
+        a = Lines[i*3].strip()
+        b = Lines[i*3+1].strip()
+        c = Lines[i*3+2].strip()
+        line = {"text1":a,"text2":b,"label":c}
+        train_data.append(line)
+    val_data = []
+    for i in range(80000):
+        a = Lines[i*3].strip()
+        b = Lines[i*3+1].strip()
+        c = Lines[i*3+2].strip()
+        line = {"text1":a,"text2":b,"label":c}
+        val_data.append(line)
+    test_data = []
+    for i in range(80000):
+        a = Lines[i*3].strip()
+        b = Lines[i*3+1].strip()
+        c = Lines[i*3+2].strip()
+        line = {"text1":a,"text2":b,"label":c}
+        test_data.append(line)
+    return train_data, val_data, test_data
+
 
 def train_discriminator(
         dataset,
@@ -343,8 +369,10 @@ def train_discriminator(
     start = time.time()
 
     if dataset == "SST":
-        idx2class = ["positive", "negative", "very positive", "very negative",
-                     "neutral"]
+        # idx2class = ["positive", "negative", "very positive", "very negative",
+        #              "neutral"]
+        idx2class = ["express_anger","express_joy","express_optisim","express_sadness", "tone_anger","tone_joy","tone_optisism","tone_sadness",
+                     "content"]
         class2idx = {c: i for i, c in enumerate(idx2class)}
 
         discriminator = Discriminator(
@@ -354,41 +382,40 @@ def train_discriminator(
             device=device
         ).to(device)
 
-        text = torchtext_data.Field()
-        label = torchtext_data.Field(sequential=False)
-        train_data, val_data, test_data = datasets.SST.splits(
-            text,
-            label,
-            fine_grained=True,
-            train_subtrees=True,
-        )
-
+        # train_data, val_data, test_data = datasets.SST.splits(
+        #     text,
+        #     label,
+        #     fine_grained=True,
+        #     train_subtrees=True,
+        # )
+        path = "/content/intention_label_10w.txt"
+        train_data, val_data, test_data = read_data(path)
         x = []
         y = []
         for i in trange(len(train_data), ascii=True):
             seq = TreebankWordDetokenizer().detokenize(
-                vars(train_data[i])["text"]
+                train_data[i]["text2"]
             )
             seq = discriminator.tokenizer.encode(seq)
             if add_eos_token:
                 seq = [50256] + seq
             seq = torch.tensor(seq, device=device, dtype=torch.long)
             x.append(seq)
-            y.append(class2idx[vars(train_data[i])["label"]])
+            y.append(class2idx[train_data[i]["label"]])
         train_dataset = Dataset(x, y)
 
         test_x = []
         test_y = []
         for i in trange(len(test_data), ascii=True):
             seq = TreebankWordDetokenizer().detokenize(
-                vars(test_data[i])["text"]
+                test_data[i]["text2"]
             )
             seq = discriminator.tokenizer.encode(seq)
             if add_eos_token:
                 seq = [50256] + seq
             seq = torch.tensor(seq, device=device, dtype=torch.long)
             test_x.append(seq)
-            test_y.append(class2idx[vars(test_data[i])["label"]])
+            test_y.append(class2idx[test_data[i]["label"]])
         test_dataset = Dataset(test_x, test_y)
 
         discriminator_meta = {
