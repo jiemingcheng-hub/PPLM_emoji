@@ -323,14 +323,14 @@ def read_data(data_path):
         line = {"text1":a,"text2":b,"label":c}
         train_data.append(line)
     val_data = []
-    for i in range(80000):
+    for i in range(80000,90000):
         a = Lines[i*3].strip()
         b = Lines[i*3+1].strip()
         c = Lines[i*3+2].strip()
         line = {"text1":a,"text2":b,"label":c}
         val_data.append(line)
     test_data = []
-    for i in range(80000):
+    for i in range(90000,100000):
         a = Lines[i*3].strip()
         b = Lines[i*3+1].strip()
         c = Lines[i*3+2].strip()
