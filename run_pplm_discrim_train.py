@@ -344,11 +344,11 @@ def train_discriminator(
         dataset_fp=None,
         pretrained_model="gpt2-medium",
         epochs=10,
-        learning_rate=0.0001,
+        learning_rate=0.001,
         batch_size=64,
         log_interval=10,
-        save_model=False,
-        cached=False,
+        save_model=True,
+        cached=True,
         no_cuda=False,
         output_fp='.'
 ):
@@ -371,7 +371,7 @@ def train_discriminator(
     if dataset == "SST":
         # idx2class = ["positive", "negative", "very positive", "very negative",
         #              "neutral"]
-        idx2class = ["express_anger","express_joy","express_optisim","express_sadness", "tone_anger","tone_joy","tone_optisism","tone_sadness",
+        idx2class = ["express_anger","express_joy","express_optisim","express_sadness", "tone_anger","tone_joy","tone_optimism","tone_sadness",
                      "content"]
         class2idx = {c: i for i, c in enumerate(idx2class)}
 
@@ -388,7 +388,7 @@ def train_discriminator(
         #     fine_grained=True,
         #     train_subtrees=True,
         # )
-        path = "/content/intention_label_10w.txt"
+        path = "/root/intention_label_10w.txt"
         train_data, val_data, test_data = read_data(path)
         x = []
         y = []
@@ -714,7 +714,7 @@ if __name__ == "__main__":
                         help="Pretrained model to use as encoder")
     parser.add_argument("--epochs", type=int, default=10, metavar="N",
                         help="Number of training epochs")
-    parser.add_argument("--learning_rate", type=float, default=0.0001,
+    parser.add_argument("--learning_rate", type=float, default=0.001,
                         help="Learnign rate")
     parser.add_argument("--batch_size", type=int, default=64, metavar="N",
                         help="input batch size for training (default: 64)")
@@ -729,5 +729,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_fp", default=".",
                         help="path to save the output to")
     args = parser.parse_args()
-
+    from transformers.modeling_gpt2 import GPT2LMHeadModel
+    # This downloads GPT-2 Medium, it takes a little while
+    _ = GPT2LMHeadModel.from_pretrained("gpt2-medium")
     train_discriminator(**(vars(args)))
