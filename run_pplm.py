@@ -77,11 +77,14 @@ DISCRIMINATOR_MODELS_PARAMS = {
         "pretrained_model": "gpt2-medium",
     },
     "sentiment": {
-        "url": "https://s3.amazonaws.com/models.huggingface.co/bert/pplm/discriminators/SST_classifier_head.pt",
-        "class_size": 5,
-        "embed_size": 1024,
-        "class_vocab": {"very_positive": 2, "very_negative": 3},
-        "default_class": 3,
+        #"url": "https://s3.amazonaws.com/models.huggingface.co/bert/pplm/discriminators/SST_classifier_head.pt",
+        "path":r"/root/PPLM_emoji/checkpoints/SST_classifier_head_epoch_6.pt",
+        "class_size":9, # 5
+        "embed_size":1024,
+        #"class_vocab": {"very_positive": 2, "very_negative": 3},
+        "class_vocab": {"express_anger":0,"express_joy":1,"express_optisim":2,"express_sadness":3, "tone_anger":4,"tone_joy":5,"tone_optimism":6,"tone_sadness":7,
+                     "content":8},
+        "default_class": 1,
         "pretrained_model": "gpt2-medium",
     },
 }
